@@ -2,7 +2,7 @@
   import hudsonValley from "$lib/img/Hudson-Valley--Oct-2022.jpg";
   import { onMount } from "svelte";
 
-  let canvas;
+  let artArea;
   let startX;
   let displayImage;
   let height;
@@ -10,6 +10,11 @@
 
   onMount(() => {
     displayImage = document.querySelector('img');
+    artArea = document.querySelector('.art-area');
+
+    artArea.style.width = '1000px';
+    displayImage.style.width = '1200px';
+    artArea.style.height = displayImage.style.height = '500px';
   });
 
   function changeSize(event) {
@@ -21,23 +26,28 @@
       width = value;
     }
 
-    // Set the canvas's width and height.
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
+    artArea.style.width = `${width}px`;
+    artArea.style.height = displayImage.style.height = `${height}px`;
   }
 
   function handleMouseMove(event) {
-    startX = displayImage.clientWidth / 2;
+    startX = event.clientWidth / 2;
     const currentX = event.clientX;
     const deltaX = currentX - startX;
     displayImage.style.left = `${deltaX}px`;
-    console.log(`displayImage.style.left (mouseMove): ${displayImage.style.left}`);
+    // console.log(`displayImage.style.left (mouseMove): ${displayImage.style.left}`);
   }
 
   function handleMouseDown(event) {
     startX = event.clientX - (displayImage.clientWidth / 2);
-    displayImage.draggable = true;
-    console.log(`startX (mouseDown): ${startX}`);
+    displayImage.setAttribute('draggable', true);
+    console.log(displayImage.getAttribute('draggable'));
+    // console.log(`startX (mouseDown): ${startX}`);
+  }
+
+  function handleMouseUp() {
+    displayImage.setAttribute('draggable', false);
+    console.log(displayImage.getAttribute('draggable'));
   }
 </script>
 
@@ -50,15 +60,15 @@
   <input id="width" type="text" placeholder="Width" on:input={changeSize} />
 </form>
 
-<div class="art-area" bind:this={canvas} {height}>
+<div class="art-area" bind:this={artArea} {height}>
   <img
     src={hudsonValley}
     alt="Beautiful Hudson Valley"
     {height}
     aria-hidden="true"
-    draggable="false"
     on:mousedown={handleMouseDown}
     on:mousemove={handleMouseMove}
+    on:mouseUp={handleMouseUp}
   />
 </div>
 
@@ -67,13 +77,12 @@
     border: 1px dotted black;
     z-index: 100;
     position: relative;
-    min-height: 250px;
     overflow: hidden;
+    margin-top: 2em;
   }
   
   img {
     z-index: -5;
-    overflow: hidden;
     position: absolute;
   }
 </style>
