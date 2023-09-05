@@ -68,6 +68,7 @@
     z-index: 100;
     position: relative;
     min-height: 250px;
+    overflow: hidden;
   }
   
   img {
