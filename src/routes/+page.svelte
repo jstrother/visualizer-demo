@@ -39,15 +39,15 @@
   }
 
   function handleMouseDown(event) {
-    startX = event.clientX - (displayImage.clientWidth / 2);
+    startX = event.clientX - displayImage.clientWidth;
     displayImage.setAttribute('draggable', true);
-    console.log(displayImage.getAttribute('draggable'));
+    console.log(`draggable: ${displayImage.getAttribute('draggable')}`);
     // console.log(`startX (mouseDown): ${startX}`);
   }
 
   function handleMouseUp() {
     displayImage.setAttribute('draggable', false);
-    console.log(displayImage.getAttribute('draggable'));
+    console.log(`draggable: ${displayImage.getAttribute('draggable')}`);
   }
 </script>
 
