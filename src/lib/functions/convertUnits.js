@@ -15,7 +15,7 @@ export default function convertUnits(chosenUnit, measurement) {
   }
 
   if (chosenUnit === 'feet') {
-    let tempValue = measurement *= 12;
+    let tempValue = measurement = 12;
 
     if (measurement % 12 === 0) {
       return {
