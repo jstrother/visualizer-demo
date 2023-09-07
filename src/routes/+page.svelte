@@ -8,9 +8,9 @@
   let displayImage;
 
   let height;
-  let height2;
+  let height2 = 0;
   let width;
-  let width2;
+  let width2 = 0;
 
   let viewHeight = '500px';
   let viewWidth = '1000px';
@@ -27,14 +27,11 @@
     artArea.style.width = viewWidth;
     artArea.style.height = viewHeight;
     displayImage.style.height = viewHeight;
-    
-    console.log(`onMount artArea height: ${artArea.style.height}`);
-    console.log(`onMount artArea width: ${artArea.style.width}`);
   });
 
   function changeSize(event) {
-    let value = event.target.value;
-    let id = event.target.id;
+    let value = Number(event.target.value);
+    let id = String(event.target.id);
 
     switch (id) {
       case 'height':
@@ -53,22 +50,30 @@
     
     switch (unit) {
       case 'inches':
-        viewHeight = `${height}px`;
-        viewWidth = `${width}px`;
+        viewHeight = `${convertToPx(height)}px`;
+        viewWidth = `${convertToPx(width)}px`;
         break;
       case 'centimeters':
-        viewHeight = `${height * cmToInch}px`;
-        viewWidth = `${width * cmToInch}px`;
+        viewHeight = `${convertToPx(height * cmToInch)}px`;
+        viewWidth = `${convertToPx(width * cmToInch)}px`;
         break;
       case 'feet':
-        viewHeight = `${(height * 12) + height2}px`;
-        viewWidth = `${(width * 12) + width2}px`;
+        let tempHeight = height2 + (height * 12);
+        let tempWidth = width2 + (width * 12);
+        console.log(`temp: ${tempHeight} x ${tempWidth}`);
+        viewHeight = `${convertToPx(tempHeight)}px`;
+        viewWidth = `${convertToPx(tempWidth)}px`;
+        console.log(`view: ${viewHeight} x ${viewWidth}`);
         break;
     }
 
     artArea.style.width = viewWidth;
     artArea.style.height = viewHeight;
     displayImage.style.height = viewHeight;
+
+    function convertToPx(value) {
+      return value * 3;
+    }
   }
 
   function setUnit(event) {
@@ -137,12 +142,12 @@
         <div class='height'>
           <h4>Height</h4>
           <input id='height' type='text' on:input={changeSize} placeholder={unit} />   
-          <input id='height-inches' class='visible' type='text' placeholder="inches" />
+          <input id='height-inches' class='visible' type='text' on:input={changeSize} placeholder="inches" />
         </div>
         <div class='width'>
           <h4>Width</h4>
           <input id='width' type='text' on:input={changeSize} placeholder={unit} />    
-          <input id='width-inches' class='visible' type='text' placeholder="inches" />
+          <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder="inches" />
         </div>
       </div>
       <div class='buttons'>
