@@ -2,13 +2,18 @@
   import mural from '$lib/img/AHA-Tranquil-9.jpg';
   import { onMount } from 'svelte';
 
-  import convertUnits from '$lib/functions/convertUnits.js';
+  const cmToInch = 0.393701;
 
   let artArea;
   let displayImage;
+
   let height;
+  let height2;
   let width;
-  let draggables;
+  let width2;
+
+  let viewHeight = '500px';
+  let viewWidth = '1000px';
 
   let unit = 'inches';
   let inches = true;
@@ -18,25 +23,52 @@
   onMount(() => {
     displayImage = document.querySelector('img');
     artArea = document.querySelector('.art-area');
-    draggables = document.querySelectorAll('.drag');
 
-    artArea.style.width = '1000px';
-    displayImage.style.width = '1200px';
-    artArea.style.height = displayImage.style.height = '500px';
+    artArea.style.width = viewWidth;
+    artArea.style.height = viewHeight;
+    displayImage.style.height = viewHeight;
+    
+    console.log(`onMount artArea height: ${artArea.style.height}`);
+    console.log(`onMount artArea width: ${artArea.style.width}`);
   });
 
   function changeSize(event) {
     let value = event.target.value;
     let id = event.target.id;
 
-    if (id === 'height') { // if unit === feet, need to capture inches also
-      height = value;
-    } else if (id === 'width') {
-      width = value;
+    switch (id) {
+      case 'height':
+        height = value;
+        break;
+      case 'height-inches':
+        height2 = value;
+        break;
+      case 'width':
+        width = value;
+        break;
+      case 'width-inches':
+        width2 = value;
+        break;
+    }
+    
+    switch (unit) {
+      case 'inches':
+        viewHeight = `${height}px`;
+        viewWidth = `${width}px`;
+        break;
+      case 'centimeters':
+        viewHeight = `${height * cmToInch}px`;
+        viewWidth = `${width * cmToInch}px`;
+        break;
+      case 'feet':
+        viewHeight = `${(height * 12) + height2}px`;
+        viewWidth = `${(width * 12) + width2}px`;
+        break;
     }
 
-    artArea.style.width = `${width}px`;
-    artArea.style.height = displayImage.style.height = `${height}px`;
+    artArea.style.width = viewWidth;
+    artArea.style.height = viewHeight;
+    displayImage.style.height = viewHeight;
   }
 
   function setUnit(event) {
@@ -76,11 +108,14 @@
 
   function clearFields() {
     let inputs = document.querySelectorAll('input');
-    displayImage.style.width = '1200px';
 
     for (let i = 0; i < inputs.length; i++) {
       inputs[i].value = '';
     }
+
+    displayImage.style.height = '500px';
+    artArea.style.height = '500px';
+    artArea.style.width = '1000px';
   }
 
   // Need to have three buttons to change between 'inches', 'feet & inches', and 'centimeters'
@@ -91,11 +126,10 @@
   <h1>Area Public Visualizer</h1>
 
   <div class="art-container">
-    <div class='art-area' bind:this={artArea} {height}>
+    <div class='art-area' bind:this={artArea}>
       <img
         src={mural}
-        alt='Beautiful Hudson Valley'
-        {height}
+        alt='Wonderful Art!'
       />
     </div>
     <form>      
@@ -145,14 +179,14 @@
     z-index: 100;
     position: relative;
     overflow: hidden;
-    left: 0px;
-    top: 0px;
-    background-position-x: 0px;
-    background-repeat: repeat-x;
-    background-size: contain;
     margin-top: 2em;
     max-width: 80%;
     align-self: center;
+  }
+
+  img {
+    z-index: -5;
+    position: absolute;
   }
 
   form {
@@ -186,16 +220,11 @@
   }
 
   h4 {
-    margin-bottom: -0.1em;
+    margin-bottom: -0.025em;
     align-self: center;
   }
 
   .visible {
     display: none;
-  }
-  
-  img {
-    z-index: -5;
-    position: absolute;
   }
 </style>
