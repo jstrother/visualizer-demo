@@ -1,9 +1,13 @@
 <script>
   import mural from '$lib/img/AHA-Tranquil-9.jpg';
   import { onMount } from 'svelte';
+  import TextDisplay from '$lib/components/TextDisplay.svelte';
 
   const cmToInch = 0.393701;
+  const inchToCm = 2.54;
   const priceSqFt = 7.95;
+  const defaultHeight = 108;
+  const defaultWidth = 216;
   const order = {
     height: 0,
     width: 0,
@@ -191,27 +195,36 @@
             <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder="inches" />
           </div>
         </div>
-        <div class='buttons'>
+        <div class='unit-buttons'>
           <button class='units' id='inches' on:click={setUnit} disabled>Inches</button>
           <button class='units' id='feet' on:click={setUnit}>Feet & Inches</button>
           <button class='units' id='centimeters' on:click={setUnit}>Centimeters</button>
         </div>
       </form>
       <div class="price">
-        {#if totalArea}
-        <h3>Total: ${(totalArea * priceSqFt).toFixed(2)}</h3>
         <p>{totalArea} sq ft</p>
         <p>${priceSqFt} per square foot</p>
-        <button class="clear" on:click={clearFields}>Clear Fields</button>
-        {:else}
-        <p>Enter your dimensions above and your total will show here.</p>
+        <h3>Total: ${(totalArea * priceSqFt).toFixed(2)}</h3>
+        {#if height && width}
+        <div class="cart-buttons">
+          <button disabled>Add to Cart</button>
+          <button disabled>Show Panels</button>
+          <button class="clear" on:click={clearFields}>Clear Fields</button>
+        </div>
         {/if}
+      </div>
+      <div class="text">
+        <TextDisplay />
+        <TextDisplay />
       </div>
     </div>
   </div>
 </div>
 
 <style>
+  * {
+    border: 1px solid red;
+  }
   .visualizer {
     display: flex;
     flex-flow: column nowrap;
@@ -258,7 +271,7 @@
     margin-left: 1.5em;
   }
 
-  .buttons {
+  .unit-buttons {
     align-self: center;
     max-width: 25em;
   }
@@ -301,11 +314,16 @@
     justify-content: center;
     align-items: center;
     align-self: center;
-    height: 10em;
+    height: 15em;
     width: 25em;
   }
 
   .clear {
+    align-self: center;
+  }
+  
+  .text {
+    max-width: 20em;
     align-self: center;
   }
 </style>
