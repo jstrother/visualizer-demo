@@ -4,10 +4,7 @@
   import TextDisplay from '$lib/components/TextDisplay.svelte';
 
   const cmToInch = 0.393701;
-  const inchToCm = 2.54;
   const priceSqFt = 7.95;
-  const defaultHeight = 108;
-  const defaultWidth = 216;
 
   const INCHES = 'inches';
   const FEET = 'feet';
@@ -36,14 +33,8 @@
   let feet = false;
   let centimeters = false;
 
-  $: height = initialValues(unit);
-  $: width = initialValues(unit);
-  $: height2 = initialValues(unit);
-  $: width2 = initialValues(unit);
-
   onMount(() => {
     unit = INCHES;
-    initialValues(unit);
     displayImage = document.querySelector('img');
     artArea = document.querySelector('.art-area');   
 
@@ -127,7 +118,6 @@
         event.target.disabled = true;
         document.getElementById(FEET).disabled = false;
         document.getElementById(CENTIMETERS).disabled = false;
-        initialValues(INCHES);
         clearFields();
         toggleVisibility();
         break;
@@ -138,7 +128,6 @@
         event.target.disabled = true;
         document.getElementById(INCHES).disabled = false;
         document.getElementById(CENTIMETERS).disabled = false;
-        initialValues(FEET);
         clearFields();
         toggleVisibility();
         break;
@@ -149,29 +138,8 @@
         event.target.disabled = true;
         document.getElementById(FEET).disabled = false;
         document.getElementById(INCHES).disabled = false;
-        initialValues(CENTIMETERS);
         clearFields();
         toggleVisibility();
-        break;
-    }
-  }
-
-  function initialValues(unit) {
-    switch (unit) {
-      case INCHES:
-        height = defaultHeight;
-        width = defaultWidth;
-        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
-        break;
-      case FEET:
-        height = defaultHeight / 12;
-        width = defaultWidth / 12;
-        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
-        break;
-      case CENTIMETERS:
-        height = defaultHeight * inchToCm;
-        width = defaultWidth * inchToCm;
-        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
         break;
     }
   }
@@ -221,13 +189,13 @@
         <div class='inputs'>
           <div class='height'>
             <h4>Height</h4>
-            <input id='height' type='text' on:input={changeSize} placeholder={`${Math.floor(height)} ${unit}`} />   
-            <input id='height-inches' class='visible' type='text' on:input={changeSize} placeholder='0 inches' />
+            <input id='height' type='text' on:input={changeSize} placeholder={unit} />   
+            <input id='height-inches' class='visible' type='text' on:input={changeSize} placeholder='inches' />
           </div>
           <div class='width'>
             <h4>Width</h4>
-            <input id='width' type='text' on:input={changeSize} placeholder={`${Math.floor(width)} ${unit}`} />
-            <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder='0 inches' />
+            <input id='width' type='text' on:input={changeSize} placeholder={unit} />
+            <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder='inches' />
           </div>
         </div>
         <div class='unit-buttons'>
@@ -256,7 +224,7 @@
 
 <style>
   * {
-    border: 1px solid red;
+    /* border: 1px solid red; */
   }
   .visualizer {
     display: flex;
