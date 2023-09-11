@@ -8,6 +8,11 @@
   const priceSqFt = 7.95;
   const defaultHeight = 108;
   const defaultWidth = 216;
+
+  const INCHES = 'inches';
+  const FEET = 'feet';
+  const CENTIMETERS = 'centimeters';
+
   const order = {
     height: 0,
     width: 0,
@@ -26,12 +31,19 @@
   let viewHeight = '500px';
   let viewWidth = '1000px';
 
-  let unit = 'inches';
+  let unit;
   let inches = true;
   let feet = false;
   let centimeters = false;
 
+  $: height = initialValues(unit);
+  $: width = initialValues(unit);
+  $: height2 = initialValues(unit);
+  $: width2 = initialValues(unit);
+
   onMount(() => {
+    unit = INCHES;
+    initialValues(unit);
     displayImage = document.querySelector('img');
     artArea = document.querySelector('.art-area');   
 
@@ -63,7 +75,7 @@
 
     setTimeout(() => {      
       switch (unit) {
-        case 'inches':
+        case INCHES:
           if (height > 0) viewHeight = `${convertToPx(height)}px`;
           if (width > 0) viewWidth = `${convertToPx(width)}px`;
           totalArea = height * width !== 0 ? Math.round((height / 12) * (width / 12)) : 0;
@@ -72,7 +84,7 @@
           order.totalArea = `${totalArea} sq ft`;
           order.price = `$${totalArea * priceSqFt}`;
           break;
-        case 'centimeters':
+        case CENTIMETERS:
           tempHeight = height * cmToInch;;
           tempWidth = width * cmToInch;
           if (height > 0) viewHeight = `${convertToPx(tempHeight)}px`;
@@ -83,7 +95,7 @@
           order.totalArea = `${totalArea} sq ft`;
           order.price = `$${totalArea * priceSqFt}`;
           break;
-        case 'feet':
+        case FEET:
           tempHeight = height2 + (height * 12);
           tempWidth = width2 + (width * 12);
           if (height > 0) viewHeight = `${convertToPx(tempHeight)}px`;
@@ -108,35 +120,58 @@
 
   function setUnit(event) {
     switch (event.target.id) {
-      case 'inches':
-        unit = 'inches';
+      case INCHES:
+        unit = INCHES;
         inches = true;
         feet = centimeters = false;
         event.target.disabled = true;
-        document.getElementById('feet').disabled = false;
-        document.getElementById('centimeters').disabled = false;
+        document.getElementById(FEET).disabled = false;
+        document.getElementById(CENTIMETERS).disabled = false;
+        initialValues(INCHES);
         clearFields();
         toggleVisibility();
         break;
-      case 'feet':
-        unit = 'feet';
+      case FEET:
+        unit = FEET;
         feet = true;
         inches = centimeters = false;
         event.target.disabled = true;
-        document.getElementById('inches').disabled = false;
-        document.getElementById('centimeters').disabled = false;
+        document.getElementById(INCHES).disabled = false;
+        document.getElementById(CENTIMETERS).disabled = false;
+        initialValues(FEET);
         clearFields();
         toggleVisibility();
         break;
-      case 'centimeters':
-        unit = 'centimeters';
+      case CENTIMETERS:
+        unit = CENTIMETERS;
         centimeters = true;
         feet = inches = false;
         event.target.disabled = true;
-        document.getElementById('feet').disabled = false;
-        document.getElementById('inches').disabled = false;
+        document.getElementById(FEET).disabled = false;
+        document.getElementById(INCHES).disabled = false;
+        initialValues(CENTIMETERS);
         clearFields();
         toggleVisibility();
+        break;
+    }
+  }
+
+  function initialValues(unit) {
+    switch (unit) {
+      case INCHES:
+        height = defaultHeight;
+        width = defaultWidth;
+        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
+        break;
+      case FEET:
+        height = defaultHeight / 12;
+        width = defaultWidth / 12;
+        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
+        break;
+      case CENTIMETERS:
+        height = defaultHeight * inchToCm;
+        width = defaultWidth * inchToCm;
+        totalArea = (defaultHeight / 12) * (defaultWidth / 12)
         break;
     }
   }
@@ -186,32 +221,30 @@
         <div class='inputs'>
           <div class='height'>
             <h4>Height</h4>
-            <input id='height' type='text' on:input={changeSize} placeholder={unit} />   
-            <input id='height-inches' class='visible' type='text' on:input={changeSize} placeholder="inches" />
+            <input id='height' type='text' on:input={changeSize} placeholder={`${Math.floor(height)} ${unit}`} />   
+            <input id='height-inches' class='visible' type='text' on:input={changeSize} placeholder='0 inches' />
           </div>
           <div class='width'>
             <h4>Width</h4>
-            <input id='width' type='text' on:input={changeSize} placeholder={unit} />    
-            <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder="inches" />
+            <input id='width' type='text' on:input={changeSize} placeholder={`${Math.floor(width)} ${unit}`} />
+            <input id='width-inches' class='visible' type='text' on:input={changeSize} placeholder='0 inches' />
           </div>
         </div>
         <div class='unit-buttons'>
-          <button class='units' id='inches' on:click={setUnit} disabled>Inches</button>
-          <button class='units' id='feet' on:click={setUnit}>Feet & Inches</button>
-          <button class='units' id='centimeters' on:click={setUnit}>Centimeters</button>
+          <button class='units' id={INCHES} on:click={setUnit} disabled>Inches</button>
+          <button class='units' id={FEET} on:click={setUnit}>Feet & Inches</button>
+          <button class='units' id={CENTIMETERS} on:click={setUnit}>Centimeters</button>
         </div>
       </form>
       <div class="price">
         <p>{totalArea} sq ft</p>
         <p>${priceSqFt} per square foot</p>
         <h3>Total: ${(totalArea * priceSqFt).toFixed(2)}</h3>
-        {#if height && width}
         <div class="cart-buttons">
-          <button disabled>Add to Cart</button>
-          <button disabled>Show Panels</button>
+          <button>Add to Cart</button>
+          <button>Show Panels</button>
           <button class="clear" on:click={clearFields}>Clear Fields</button>
         </div>
-        {/if}
       </div>
       <div class="text">
         <TextDisplay />
@@ -238,13 +271,14 @@
   .art-holder {
     display: flex;
     justify-content: center;
-    width: 80em;
+    width: 85em;
+    margin: 0;
   }
 
   .art-container {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-around;
+    justify-content: center;
   }
   .art-area {
     border: 1px dotted black;
@@ -316,6 +350,7 @@
     align-self: center;
     height: 15em;
     width: 25em;
+    margin: 0;
   }
 
   .clear {
